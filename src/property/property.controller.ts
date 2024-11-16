@@ -15,6 +15,8 @@ import {
 import { CreatePropertyDto } from './dto/createProperty.dto';
 import { IdParamDto } from './dto/idParam.dto';
 import { ParseIdPipe } from './pipes/parseIdPipe';
+import { ZodValidationPipe } from './pipes/zodValidationPipe';
+import { CreatePropertySchema } from './dto/createPropertyZod.dto';
 
 @Controller('property')
 export class PropertyController {
@@ -35,18 +37,22 @@ export class PropertyController {
   }
 
   @Post()
-  // can use the UsePipes decorator to set the validation pipe
-  @UsePipes(
-    new ValidationPipe({
-      // If have used global validation pipe, don't need to set for each controller
-      // whitelist: true,
-      // forbidNonWhitelisted: true,
+  // --- can use the UsePipes decorator to set the validation pipe ---
+  // @UsePipes(
+  //   new ValidationPipe({
+  //     // If have used global validation pipe, don't need to set for each controller
+  //     // whitelist: true,
+  //     // forbidNonWhitelisted: true,
 
-      // --- The groups doesn't work on global validation pipe ---
-      groups: ['create'],
-      always: true,
-    }),
-  )
+  //     // --- The groups doesn't work on global validation pipe ---
+  //     groups: ['create'],
+  //     always: true,
+  //   }),
+  // )
+
+  // --- config UsePipes with zod library ---
+  @UsePipes(new ZodValidationPipe(CreatePropertySchema))
+
   // @HttpCode(202)
   create(@Body() body: CreatePropertyDto) {
     console.log({ body });
