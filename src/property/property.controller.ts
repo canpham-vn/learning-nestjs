@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
   HttpCode,
   Param,
   ParseBoolPipe,
@@ -79,8 +80,11 @@ export class PropertyController {
       }),
     )
     body: CreatePropertyDto,
+    @Headers('host') host,
   ) {
-    console.log(typeof id);
-    return body;
+    // console.log(typeof id);
+    // return body;
+
+    return host;
   }
 }
