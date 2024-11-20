@@ -15,12 +15,12 @@ export class CreatePropertyDto {
   // the groups doesn't work on global validation
   // just the first one will be applied
   @IsString()
-  @Length(2, 10, { groups: ['create'] })
-  @Length(1, 15, { groups: ['update'] })
+  // @Length(2, 10, { groups: ['create'] })
+  // @Length(1, 15, { groups: ['update'] })
   description: string;
 
   @IsInt()
   @IsPositive()
   // @IsOptional()
-  area: number;
+  price: number;
 }

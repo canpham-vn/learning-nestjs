@@ -2,8 +2,12 @@ import { Module, ValidationPipe } from '@nestjs/common';
 import { PropertyController } from './property.controller';
 import { APP_PIPE } from '@nestjs/core';
 import { PropertyService } from './property.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Property } from 'src/entities/property.entity';
 
 @Module({
+  // --- Register the repository of the property entity in the property module ---
+  imports: [TypeOrmModule.forFeature([Property])],
   controllers: [PropertyController],
 
   // --- can config the validation for specific module
