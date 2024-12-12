@@ -26,7 +26,10 @@ export class UserService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} user`;
+    return this.UserRepo.findOne({
+      where: { id },
+      select: ['firstName', 'lastName', 'avatarUrl'],
+    });
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
