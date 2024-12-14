@@ -14,10 +14,19 @@ export class AuthService {
   async validateUser(email: string, password: string) {
     const user = await this.userService.findByEmail(email);
     if (!user) throw new UnauthorizedException('User not found!');
+
+    /**
+     * Sử dụng hàm compare từ bcrypt để so sánh password từ request với password được hashing trong db
+     * Không cần sử dụng salt round vì trong password sau khi hashing đã chứa thông tin salt round và hàm compare có thể dựa vào đó để so sánh
+     */
     const isPasswordMatch = await compare(password, user.password);
     if (!isPasswordMatch)
       throw new UnauthorizedException('Invalid credentials!');
 
+    /**
+     * chỉ cần return id là đủ.
+     * Vì trong user object có nhiều trường không cần thiết và không nên return như password,...
+     */
     return { id: user.id };
   }
 

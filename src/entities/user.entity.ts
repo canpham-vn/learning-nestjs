@@ -41,8 +41,16 @@ export class User {
   @JoinTable({ name: 'user_liked_properties' })
   likedProperties: Property[];
 
+  /*
+   * Sử dụng trigger để hasing password trước khi insert vào db
+   */
   @BeforeInsert()
   async hashPassword() {
+    /*
+     * Tham số thứ 2 trong hàm hash là salt round
+     * Thể hiện đô phực tạp của hasing password, số càng lớn độ phức tạp càng cao
+     * nhưng cần cân nhắc vì càng phức tạp tốc độ sẽ càng chậm
+     */
     this.password = await bcrypt.hash(this.password, 10);
   }
 }
