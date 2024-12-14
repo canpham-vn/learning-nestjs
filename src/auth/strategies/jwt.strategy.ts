@@ -5,6 +5,11 @@ import { ConfigType } from '@nestjs/config';
 import { AuthJwtPayload } from '../types/auth-jwtPayload';
 import { Inject, Injectable } from '@nestjs/common';
 
+/**
+ * Chịu trách nhiệm trích xuất JWT từ req và kiểm tra token có hợp lệ không
+ * Nếu hợp lệ, thì cho phép người có thể tiếp tục truy cập api
+ */
+
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
@@ -17,6 +22,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
+  /**
+   * Không cần xử lý validate ở đây, vì nó đã được validate từ thư viện passport
+   * và chỉ cần turn thông tin id cho controller
+   */
   validate(payload: AuthJwtPayload) {
     return { id: payload.sub };
   }

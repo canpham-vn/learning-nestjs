@@ -31,6 +31,7 @@ export class AuthService {
   }
 
   login(userId: number) {
+    // payload là 1 object chưa thông tin được jwt mã hóa và được gửi cho client
     const payload: AuthJwtPayload = { sub: userId };
     return this.jwtService.sign(payload);
   }
