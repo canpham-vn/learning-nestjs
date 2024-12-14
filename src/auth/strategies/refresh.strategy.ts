@@ -4,21 +4,26 @@ import jwtConfig from '../config/jwt.config';
 import { ConfigType } from '@nestjs/config';
 import { AuthJwtPayload } from '../types/auth-jwtPayload';
 import { Inject, Injectable } from '@nestjs/common';
+import refreshJwtConfig from '../config/refresh-jwt.config';
 
 /**
- * Chịu trách nhiệm trích xuất JWT từ req và kiểm tra token có hợp lệ không
- * Nếu hợp lệ, thì cho phép người có thể tiếp tục truy cập api
+ * Tương tự jwt strategy token
+ * Chịu trách nhiệm trích xuất refresh token từ req và kiểm tra refresh token có hợp lệ không
+ * Nếu hợp lệ, tạo mới token
  */
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class RefreshJwtStrategy extends PassportStrategy(
+  Strategy,
+  'refresh-jwt',
+) {
   constructor(
-    @Inject(jwtConfig.KEY)
-    private jwtConfiguration: ConfigType<typeof jwtConfig>,
+    @Inject(refreshJwtConfig.KEY)
+    private refreshJwtConfiguration: ConfigType<typeof refreshJwtConfig>,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: jwtConfiguration.secret,
+      secretOrKey: refreshJwtConfiguration.secret,
       ignoreExpiration: false,
     });
   }

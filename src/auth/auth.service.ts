@@ -1,14 +1,18 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
 import { UserService } from 'src/user/user.service';
 import { AuthJwtPayload } from './types/auth-jwtPayload';
+import refreshJwtConfig from './config/refresh-jwt.config';
+import { ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
+    @Inject(refreshJwtConfig.KEY)
+    private refreshTokenConfig: ConfigType<typeof refreshJwtConfig>,
   ) {}
 
   async validateUser(email: string, password: string) {
@@ -33,6 +37,31 @@ export class AuthService {
   login(userId: number) {
     // payload là 1 object chưa thông tin được jwt mã hóa và được gửi cho client
     const payload: AuthJwtPayload = { sub: userId };
-    return this.jwtService.sign(payload);
+
+    /**
+     * token dùng để xác thực user có hợp lệ hay không
+     * khi người dùng truy cập các api có auth, cần truyền token trong header của req để xác thực
+     */
+    const token = this.jwtService.sign(payload);
+    /**
+     * Khi token hết hạn, client sẽ gửi refreshToken để thông báo làm mới token
+     */
+    const refreshToken = this.jwtService.sign(payload, this.refreshTokenConfig);
+
+    return {
+      id: userId,
+      token,
+      refreshToken,
+    };
+  }
+
+  refreshToken(userId: number) {
+    const payload: AuthJwtPayload = { sub: userId };
+    const token = this.jwtService.sign(payload);
+
+    return {
+      id: userId,
+      token,
+    };
   }
 }
