@@ -1,10 +1,11 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import jwtConfig from '../config/jwt.config';
 import { ConfigType } from '@nestjs/config';
 import { AuthJwtPayload } from '../types/auth-jwtPayload';
 import { Inject, Injectable } from '@nestjs/common';
 import refreshJwtConfig from '../config/refresh-jwt.config';
+import { Request } from 'express';
+import { AuthService } from '../auth.service';
 
 /**
  * Tương tự jwt strategy token
@@ -20,11 +21,14 @@ export class RefreshJwtStrategy extends PassportStrategy(
   constructor(
     @Inject(refreshJwtConfig.KEY)
     private refreshJwtConfiguration: ConfigType<typeof refreshJwtConfig>,
+    private authService: AuthService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: refreshJwtConfiguration.secret,
       ignoreExpiration: false,
+      // để có thể truy cập req trong callback (hàm validate)
+      passReqToCallback: true,
     });
   }
 
@@ -32,7 +36,10 @@ export class RefreshJwtStrategy extends PassportStrategy(
    * Không cần xử lý validate ở đây, vì nó đã được validate từ thư viện passport
    * và chỉ cần turn thông tin id cho controller
    */
-  validate(payload: AuthJwtPayload) {
-    return { id: payload.sub };
+  validate(req: Request, payload: AuthJwtPayload) {
+    // authorization: Bearer abcxyz
+    const refreshToken = req.get('authorization').replace('Bearer', '').trim();
+    const userId = payload.sub;
+    return this.authService.validateRefreshToken(userId, refreshToken);
   }
 }
